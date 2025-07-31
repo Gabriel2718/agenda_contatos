@@ -1,16 +1,15 @@
-# agenda_contatos
+# Agenda de Contatos
 
-A new Flutter project.
+Um projeto Flutter.
 
-## Getting Started
+## Descrição
 
-This project is a starting point for a Flutter application.
+Este projeto consiste em uma agenda de contatos, na qual o usuário pode editar o nome e-mail, telefone e atribuir uma 
+foto de perfil para cada contato.
 
-A few resources to get you started if this is your first Flutter project:
+## Bibliotecas Utilizadas
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- cupertino_icons v1.0.8
+- sqflite v2.4.2
+- url_launcher v6.3.2
+- image_picker v1.1.2
