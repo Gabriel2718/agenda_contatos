@@ -7,16 +7,18 @@ import 'package:url_launcher/url_launcher.dart';
 enum OrderOptions { orderaz, orderza }
 
 class HomePage extends StatefulWidget {
+  Function(bool) onToogleTheme;
+
+  HomePage({required this.onToogleTheme});
+
   @override
   State<StatefulWidget> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
   ContactHelper helper = ContactHelper();
-
   List<Contact> contacts = [];
-
-  bool isDarkMode = false;
+  bool _isDarkMode = false;
 
   @override
   void initState() {
@@ -26,65 +28,70 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: isDarkMode ? Brightness.dark : Brightness.light,
-      ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'Contatos',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w500,
-              fontSize: 24.0,
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Contatos',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w500,
+            fontSize: 24.0,
           ),
-          backgroundColor: Colors.red,
-          centerTitle: true,
-          actionsIconTheme: IconThemeData(color: Colors.white),
-          actions: [
-            Switch(
-              value: isDarkMode,
-              onChanged: (value) {
-                setState(() {
-                  isDarkMode = value;
-                });
-              },
-              inactiveTrackColor: Colors.white,
-              activeTrackColor: Colors.white,
-              activeColor: Colors.deepOrange,
-              inactiveThumbColor: Colors.deepOrange,
-            ),
-            PopupMenuButton<OrderOptions>(
-              itemBuilder: (context) => <PopupMenuItem<OrderOptions>>[
-                const PopupMenuItem<OrderOptions>(
-                  child: Text('Ordenar de A-Z'),
-                  value: OrderOptions.orderaz,
+        ),
+        backgroundColor: Colors.red,
+        centerTitle: true,
+        actionsIconTheme: IconThemeData(color: Colors.white),
+        actions: [
+          PopupMenuButton<OrderOptions>(
+            itemBuilder: (context) => <PopupMenuItem<OrderOptions>>[
+              PopupMenuItem(
+                child: StatefulBuilder(
+                  builder: (context, setState) {
+                    return Row(
+                      children: [
+                        Icon(
+                          _isDarkMode ? Icons.dark_mode : Icons.sunny,
+                          color: _isDarkMode ? Colors.white : Colors.black54,
+                        ),
+                        Switch(
+                          value: _isDarkMode,
+                          onChanged: (value) {
+                            setState(() {
+                              _isDarkMode = value;
+                              widget.onToogleTheme(value);
+                            });
+                          },
+                        )
+                      ],
+                    );
+                  },
                 ),
-                const PopupMenuItem<OrderOptions>(
-                  child: Text('Ordenar de Z-A'),
-                  value: OrderOptions.orderza,
-                ),
-              ],
-              onSelected: _orderList,
-            ),
-          ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => _showContactPage(),
-          backgroundColor: Colors.red,
-          shape: CircleBorder(),
-          child: Icon(Icons.add, color: Colors.white),
-        ),
-        body: ListView.builder(
-          padding: EdgeInsets.all(10.0),
-          itemCount: contacts.length,
-          itemBuilder: (context, index) {
-            return _contactCard(context, index);
-          },
-        ),
+              ),
+              const PopupMenuItem<OrderOptions>(
+                child: Text('Ordenar de A-Z'),
+                value: OrderOptions.orderaz,
+              ),
+              const PopupMenuItem<OrderOptions>(
+                child: Text('Ordenar de Z-A'),
+                value: OrderOptions.orderza,
+              ),
+            ],
+            onSelected: _orderList,
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showContactPage(),
+        backgroundColor: Colors.red,
+        shape: CircleBorder(),
+        child: Icon(Icons.add, color: Colors.white),
+      ),
+      body: ListView.builder(
+        padding: EdgeInsets.all(10.0),
+        itemCount: contacts.length,
+        itemBuilder: (context, index) {
+          return _contactCard(context, index);
+        },
       ),
     );
   }
