@@ -4,6 +4,8 @@ import 'dart:io';
 import 'contact_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+enum OrderOptions { orderaz, orderza }
+
 class HomePage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _HomePageState();
@@ -14,40 +16,75 @@ class _HomePageState extends State<HomePage> {
 
   List<Contact> contacts = [];
 
+  bool isDarkMode = false;
+
   @override
   void initState() {
     super.initState();
-
     _getAllContacts();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Contatos',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w500,
-            fontSize: 24.0,
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        brightness: isDarkMode ? Brightness.dark : Brightness.light,
+      ),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'Contatos',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
+              fontSize: 24.0,
+            ),
           ),
+          backgroundColor: Colors.red,
+          centerTitle: true,
+          actionsIconTheme: IconThemeData(color: Colors.white),
+          actions: [
+            Switch(
+              value: isDarkMode,
+              onChanged: (value) {
+                setState(() {
+                  isDarkMode = value;
+                });
+              },
+              inactiveTrackColor: Colors.white,
+              activeTrackColor: Colors.white,
+              activeColor: Colors.deepOrange,
+              inactiveThumbColor: Colors.deepOrange,
+            ),
+            PopupMenuButton<OrderOptions>(
+              itemBuilder: (context) => <PopupMenuItem<OrderOptions>>[
+                const PopupMenuItem<OrderOptions>(
+                  child: Text('Ordenar de A-Z'),
+                  value: OrderOptions.orderaz,
+                ),
+                const PopupMenuItem<OrderOptions>(
+                  child: Text('Ordenar de Z-A'),
+                  value: OrderOptions.orderza,
+                ),
+              ],
+              onSelected: _orderList,
+            ),
+          ],
         ),
-        backgroundColor: Colors.red,
-        centerTitle: true,
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showContactPage(),
-        backgroundColor: Colors.red,
-        shape: CircleBorder(),
-        child: Icon(Icons.add, color: Colors.white),
-      ),
-      body: ListView.builder(
-        padding: EdgeInsets.all(10.0),
-        itemCount: contacts.length,
-        itemBuilder: (context, index) {
-          return _contactCard(context, index);
-        },
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => _showContactPage(),
+          backgroundColor: Colors.red,
+          shape: CircleBorder(),
+          child: Icon(Icons.add, color: Colors.white),
+        ),
+        body: ListView.builder(
+          padding: EdgeInsets.all(10.0),
+          itemCount: contacts.length,
+          itemBuilder: (context, index) {
+            return _contactCard(context, index);
+          },
+        ),
       ),
     );
   }
@@ -176,6 +213,20 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void _orderList(OrderOptions result) {
+    switch (result) {
+      case OrderOptions.orderaz:
+        contacts.sort(
+            (a, b) => a.name!.toLowerCase().compareTo(b.name!.toLowerCase()));
+        break;
+      case OrderOptions.orderza:
+        contacts.sort(
+            (a, b) => b.name!.toLowerCase().compareTo(a.name!.toLowerCase()));
+        break;
+    }
+    setState(() {});
+  }
+
   void _getAllContacts() {
     helper.getAllContacts().then(
           (list) => setState(() {
@@ -206,6 +257,8 @@ class _HomePageState extends State<HomePage> {
       builder: (context) {
         return AlertDialog(
           title: Text('Excluir contato?'),
+          actionsAlignment: MainAxisAlignment.center,
+          actionsPadding: EdgeInsets.all(10.0),
           actions: [
             TextButton(
               onPressed: () {
